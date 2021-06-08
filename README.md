@@ -285,6 +285,7 @@ Response received:
 }
 ```
 Estimamos que un tiempo razonable para que puedas resolver este desafío es de 4 horas.
+x
 
  
  
