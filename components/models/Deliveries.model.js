@@ -1,3 +1,4 @@
+import { object } from '@hapi/joi';
 import mongoose from 'mongoose';
 
 const deliveries = new mongoose.Schema({
@@ -14,12 +15,23 @@ const deliveries = new mongoose.Schema({
     postalCode: String,
     city: String,
   },
-  products: [
+  /*products: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Products',
     }
-  ],
+  ],*/
+  products:[{
+        reference: {
+          type: String,
+        },
+        description: {
+          type: String,
+        },
+        weight: Number,
+        height: Number
+    }
+  ]
 }, { timestamp: true, strict: false });
 
 

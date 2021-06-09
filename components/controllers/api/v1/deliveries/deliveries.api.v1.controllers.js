@@ -30,5 +30,11 @@ router.route('/:id')
     (req, res, next) => responses(deliveriesCommonServices.findOne, req, res, next))
 
 
+router.route('/:dateFrom/:dateTo/:weight/:page/:limit')
+    .get(
+      (req, res, next) => handler(getValidator, req, res, next, validations['mainFilter']),
+      (req, res, next) => responses(deliveriesCommonServices.filter, req, res, next))
+
+
 // export
 module.exports = router

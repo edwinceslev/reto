@@ -33,6 +33,75 @@ const find = async (req) => {
   }
 }
 
+const filter = async (req) => {
+
+  let weight = 0
+  let limit = req.body.limit ? (req.body.limit > 100 ? 100 : parseInt(req.body.limit)) : 100;
+  let skip = req.body.page ? ((Math.max(0, parseInt(req.body.page)) - 1) * limit) : 0;
+  let sort = { _id: 1 }
+  weight = parseInt(req.body.weight)
+
+  let totalResults = [];
+  totalResults  = await Deliveries.aggregate([
+    { $match:  {
+      $and: [
+             {when: {$gte: new Date( req.body.dateFrom)}},
+             {when: {$lte: new Date( req.body.dateTo)}}]
+                },
+    },
+{$lookup:
+{
+             from: 'products',
+             localField: 'products',
+             foreignField: '_id',
+             as: 'products'
+}}
+,
+{ $match: { 'products.weight': weight  }
+
+   }]).exec();
+
+  totalResults = totalResults.length
+
+  if (totalResults < 1) {
+    throw {
+      code: 404,
+      data: {
+        message: `We couldn't find any delivery`
+      }
+    }
+  }
+
+let deliveries = [];
+ deliveries = await Deliveries.aggregate([
+  { $match:  {
+    $and: [
+           {when: {$gte: new Date( req.body.dateFrom)}},
+           {when: {$lte: new Date( req.body.dateTo)}}]
+              },
+  },
+{$lookup:
+{
+           from: 'products',
+           localField: 'products',
+           foreignField: '_id',
+           as: 'products'
+}}
+,
+{ $match: { 'products.weight': weight }
+
+ },
+ { $skip : skip},
+ { $limit : limit},
+ { $sort : sort}
+]).exec();
+
+  return {
+    totalResults: totalResults,
+    deliveries
+  }
+}
+
 const create = async (req) => {
   try {
     await Deliveries.create(req.body);
@@ -62,6 +131,7 @@ const findOne = async (req) => {
 
 export default {
   find,
+  filter,
   create,
   findOne
 }
